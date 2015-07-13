@@ -1,0 +1,155 @@
+<html>
+<head>
+
+  <style>
+        body {
+        margin: 0px;
+        padding: 0px;
+        }
+        </style>
+</head>
+<body bgcolor= #FFFFFF >
+  </br></br><center>
+  <canvas id="paper" width="500" height="400" style="border:5px solid blue;">
+  </canvas>
+</br>
+  <button onClick  = "start()">start</button>
+</br></br>
+<p> Point :</p> <b><p id="demo">Press Start to begin</p><b></center>
+</body>
+    <script type="text/javascript">
+    var colors = ['red', 'blue', 'green', 'pink', 'yellow', 'brown'];
+    var lastStamp = 0;
+    var canvas = document.getElementById("paper");
+    var sprites = []
+    var left = 1;
+    var interval = 0;
+    function makeNewSprite() {
+    sprites.push({
+        x: canvas.width /2,
+        y: canvas.height /2,
+        r: random(20,10),
+        size: random(40, 20),
+        color: colors[random(colors.length)],
+        v: 100,
+        alive:1,
+        heading: random(360, 1)
+    });
+  }
+
+  function hit(){
+    distance(x1, y1, x2, y2);
+  };
+  function start(){
+    interval = setInterval(function(){point() 
+    },1000 );  
+    makeNewSprite()
+  };
+
+    function move(s, ms){
+      var distance = s.v * ms/1000;
+      var degree = Math.PI * s.heading / 180
+      s.x += Math.cos(degree) * distance;
+      s.y += Math.sin(degree) * distance;
+
+     for(var i = 0 ; i < sprites.length ; i++){ 
+          if( sprites[i].alive && check(sprites[i]) ){
+            console.log(i + " " + "lose");
+            sprites[i].alive = 0;
+            left--;
+            sprites[i].v += 50
+          }
+      }
+    };
+    
+    function draw(){
+      if( !left ){
+          alert('YOUR SCORE IS :' + ' ' + count)
+          count = 0;
+          clearInterval(interval);
+          return 1;
+      }
+
+      var currentStamp = new Date().getTime();
+      if(lastStamp != 0){
+        var ms = currentStamp - lastStamp;
+        for(var i = 0; i <sprites.length; i++){
+          if( sprites[i].alive ){
+            var s = sprites[i];
+            move(s, ms);
+          }
+        }
+      };
+
+      var context = canvas.getContext('2d');
+      context.clearRect(0, 0, canvas.width, canvas.height);  
+
+      for(var i = 0; i <sprites.length; i++){
+        var s = sprites[i];  
+        context.beginPath();
+        context.arc(s.x, s.y, s.r, 0, 2 * Math.PI, false);
+        context.fillStyle = s.color;
+        context.fill();
+        context.stroke();
+      }
+
+      lastStamp = currentStamp;
+      window.requestAnimationFrame(draw);
+    }
+    window.requestAnimationFrame(draw);
+    
+
+  //=================================================================
+    function check(s){
+      var checkCanvas = false
+      if(s.x - s.r >= canvas.width || s.y - s.r >= canvas.height){
+          console.log(checkCanvas);
+          return checkCanvas =  true;
+      }
+      if(s.x + s.r <= 0 || s.y + s.r <= 0){
+          console.log(checkCanvas);
+          return checkCanvas =  true;
+      }
+    }
+
+    function random(to, from){
+      from = from || 0
+      return Math.floor((Math.random() * to) + from);
+    }
+    function distance(x1, y1, x2, y2){
+      return Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+    }
+
+    function onClick(x, y){
+      console.log(x + ":" + y);
+      for(var i = 0; i <sprites.length; i++){
+        var s = sprites[i];
+          if(distance(x, y, s.x, s.y ) < s.size == true){
+            s.heading +=90
+          }
+        }
+    }
+    
+    canvas.addEventListener('mousedown', function(evt) {
+          var rect = canvas.getBoundingClientRect();
+          var x = evt.clientX - rect.left;
+          var y = evt.clientY - rect.top;  
+          onClick(x, y);
+        }, false);
+    //timer
+    var count = 0 ; 
+
+    function point() {
+      document.getElementById("demo").innerHTML = ++count ;
+      if(count == 5){
+        makeNewSprite()
+        left++;
+      }
+      if(count == 10){
+        makeNewSprite()
+        makeNewSprite()
+        left+=2;
+      }
+     }
+    </script>
+</html>
